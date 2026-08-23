@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radar POS Kazajistán</title>
+<meta name="description" content="Dashboard interactivo para priorizar puntos de venta retail en Kazajistán por índice de potencial.">
+<meta name="theme-color" content="#1f6f6a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%AA%A8%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --bg: #f1f1ec;
+    --surface: #fcfcfb;
+    --surface-raised: #ffffff;
+    --ink-900: #1b1a17;
+    --ink-600: #55534c;
+    --ink-400: #8a887f;
+    --line: rgba(27,26,23,0.12);
+    --line-strong: rgba(27,26,23,0.22);
+    --accent: #1f6f6a;
+    --accent-ink: #ffffff;
+    --accent-soft: rgba(31,111,106,0.12);
+    --cat-interiorismo: #2a78d6;
+    --cat-hibrido: #eb6834;
+    --cat-cocinabano: #1baf7a;
+    --status-alto: #0ca30c;
+    --status-medio: #b8790a;
+    --status-bajo: #8a887f;
+    --status-alto-soft: rgba(12,163,12,0.13);
+    --status-medio-soft: rgba(250,178,25,0.20);
+    --status-bajo-soft: rgba(138,136,127,0.14);
+    --shadow: 0 12px 32px rgba(27,26,23,0.10), 0 2px 8px rgba(27,26,23,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg: #131310;
+      --surface: #1a1a19;
+      --surface-raised: #201f1c;
+      --ink-900: #f6f5f1;
+      --ink-600: #c7c4b8;
+      --ink-400: #928f85;
+      --line: rgba(255,255,255,0.12);
+      --line-strong: rgba(255,255,255,0.24);
+      --accent: #4db3ab;
+      --accent-ink: #06201e;
+      --accent-soft: rgba(77,179,171,0.18);
+      --cat-interiorismo: #3987e5;
+      --cat-hibrido: #d95926;
+      --cat-cocinabano: #199e70;
+      --status-alto: #17c217;
+      --status-medio: #fab219;
+      --status-bajo: #928f85;
+      --status-alto-soft: rgba(23,194,23,0.16);
+      --status-medio-soft: rgba(250,178,25,0.16);
+      --status-bajo-soft: rgba(146,143,133,0.16);
+      --shadow: 0 12px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg: #131310;
+    --surface: #1a1a19;
+    --surface-raised: #201f1c;
+    --ink-900: #f6f5f1;
+    --ink-600: #c7c4b8;
+    --ink-400: #928f85;
+    --line: rgba(255,255,255,0.12);
+    --line-strong: rgba(255,255,255,0.24);
+    --accent: #4db3ab;
+    --accent-ink: #06201e;
+    --accent-soft: rgba(77,179,171,0.18);
+    --cat-interiorismo: #3987e5;
+    --cat-hibrido: #d95926;
+    --cat-cocinabano: #199e70;
+    --status-alto: #17c217;
+    --status-medio: #fab219;
+    --status-bajo: #928f85;
+    --status-alto-soft: rgba(23,194,23,0.16);
+    --status-medio-soft: rgba(250,178,25,0.16);
+    --status-bajo-soft: rgba(146,143,133,0.16);
+    --shadow: 0 12px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  *{ box-sizing: border-box; }
+  html{ -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink-900);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono{ font-family: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace; }
+  .tab{ font-variant-numeric: tabular-nums; }
+
+  a{ color: inherit; }
+  button{ font: inherit; color: inherit; }
+
+  :focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+  .shell{ max-width: 1280px; margin: 0 auto; padding: 0 20px 64px; }
+
+  /* ---------- Header ---------- */
+  header.top{
+    position: sticky; top: 0; z-index: 30;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-inner{ max-width: 1280px; margin: 0 auto; padding: 18px 20px 16px; }
+  .top-row{ display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  .top-copy{ flex: 1; min-width: 240px; }
+  .eyebrow{
+    text-transform: uppercase; letter-spacing: .10em; font-size: .70rem; font-weight: 600;
+    color: var(--accent); margin: 0 0 6px;
+  }
+  h1{
+    margin: 0 0 4px; font-size: clamp(1.35rem, 2.4vw, 1.9rem); font-weight: 700;
+    letter-spacing: -0.01em; text-wrap: balance;
+  }
+  .subtitle{ margin: 0; color: var(--ink-600); font-size: .92rem; max-width: 62ch; }
+
+  .lang-switch{
+    display: flex; gap: 3px; border: 1px solid var(--line-strong); border-radius: 999px;
+    padding: 3px; background: var(--surface); flex-shrink: 0;
+  }
+  .lang-btn{
+    border: none; background: transparent; padding: 7px 13px; border-radius: 999px;
+    font-size: .74rem; font-weight: 600; letter-spacing: .03em; cursor: pointer; color: var(--ink-600);
+  }
+  .lang-btn[aria-pressed="true"]{ background: var(--accent); color: var(--accent-ink); }
+  .lang-btn:hover:not([aria-pressed="true"]){ color: var(--ink-900); }
+
+  .kpis{
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    margin-top: 16px;
+  }
+  .kpi{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .kpi-label{ font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-400); font-weight: 600; }
+  .kpi-value{ font-size: 1.5rem; font-weight: 600; margin-top: 3px; }
+
+  /* ---------- Filters ---------- */
+  .filters{
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    margin: 20px 0 16px; padding: 12px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 12px;
+  }
+  .filter-group{ display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .filter-label{ font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-400); font-weight: 600; margin-right: 2px; }
+  select{
+    background: var(--surface-raised); color: var(--ink-900); border: 1px solid var(--line-strong);
+    border-radius: 8px; padding: 6px 10px; font-size: .82rem; cursor: pointer;
+  }
+  .chip{
+    border: 1px solid var(--line-strong); background: var(--surface-raised); color: var(--ink-600);
+    border-radius: 999px; padding: 5px 12px; font-size: .78rem; font-weight: 500; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; transition: background .12s, color .12s, border-color .12s;
+  }
+  .chip .dot{ width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .55; }
+  .chip[aria-pressed="true"]{ background: var(--accent-soft); border-color: var(--accent); color: var(--ink-900); }
+  .chip[aria-pressed="true"] .dot{ opacity: 1; }
+  .chip:hover{ border-color: var(--accent); }
+  .search-wrap{ margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  input[type="search"]{
+    background: var(--surface-raised); color: var(--ink-900); border: 1px solid var(--line-strong);
+    border-radius: 8px; padding: 6px 10px 6px 30px; font-size: .82rem; width: 200px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a887f' stroke-width='2'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+    background-repeat: no-repeat; background-position: 9px center;
+  }
+  .reset-btn{
+    border: 1px solid transparent; background: transparent; color: var(--ink-400);
+    font-size: .78rem; text-decoration: underline; cursor: pointer; padding: 4px 2px;
+  }
+  .reset-btn:hover{ color: var(--ink-900); }
+  .result-count{ font-size: .78rem; color: var(--ink-400); margin: 0 0 10px; }
+
+  /* ---------- Section headers ---------- */
+  .section-head{ display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 28px 0 10px; flex-wrap: wrap; }
+  .section-title{ font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; color: var(--ink-600); }
+  .section-hint{ font-size: .78rem; color: var(--ink-400); }
+
+  /* ---------- Scatter (positioning) ---------- */
+  .scatter-card{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 16px 8px;
+    box-shadow: var(--shadow);
+  }
+  .scatter-legend{ display: flex; flex-wrap: wrap; gap: 14px; padding: 0 4px 14px; }
+  .legend-item{ display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--ink-600); }
+  .legend-swatch{ width: 10px; height: 10px; border-radius: 3px; }
+  .legend-item.ring-note .legend-swatch{ border-radius: 50%; background: transparent; border: 2px solid var(--status-alto); }
+
+  .scatter-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .city-col{ border: 1px solid var(--line); border-radius: 10px; padding: 10px 8px 6px; background: color-mix(in srgb, var(--surface) 96%, var(--ink-900) 2%); }
+  .city-col h3{ margin: 0 0 2px; font-size: .82rem; font-weight: 600; text-align: center; }
+  .city-col .city-n{ text-align: center; font-size: .68rem; color: var(--ink-400); margin-bottom: 4px; }
+  .plot{ position: relative; height: 460px; border-left: 1px solid var(--line); }
+  .plot .gridline{ position: absolute; left: 0; right: 0; border-top: 1px dashed var(--line); }
+  .plot .gridline span{ position: absolute; left: 4px; top: -8px; font-size: .62rem; color: var(--ink-400); background: var(--surface); padding: 0 3px; }
+  .dot{
+    position: absolute; width: 13px; height: 13px; border-radius: 50%;
+    transform: translate(-50%, 50%); cursor: pointer;
+    border: 2px solid var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.25);
+    transition: transform .12s ease;
+  }
+  .dot:hover, .dot:focus-visible{ transform: translate(-50%, 50%) scale(1.35); z-index: 5; }
+  .dot.selected{ outline: 2px solid var(--ink-900); outline-offset: 2px; }
+
+  .tooltip{
+    position: fixed; z-index: 60; pointer-events: none; background: var(--ink-900); color: var(--bg);
+    padding: 8px 10px; border-radius: 8px; font-size: .76rem; max-width: 240px; box-shadow: var(--shadow);
+    opacity: 0; transform: translateY(4px); transition: opacity .1s, transform .1s;
+  }
+  .tooltip.show{ opacity: 1; transform: translateY(0); }
+  .tooltip b{ display: block; margin-bottom: 2px; font-size: .8rem; }
+  .tooltip .tt-row{ color: color-mix(in srgb, var(--bg) 70%, transparent); }
+
+  /* ---------- Table ---------- */
+  .table-card{ background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  .table-scroll{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table{ width: 100%; border-collapse: collapse; min-width: 720px; }
+  thead th{
+    position: sticky; top: 0; background: var(--surface-raised); text-align: left; font-size: .68rem;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--ink-400); font-weight: 600;
+    padding: 10px 12px; border-bottom: 1px solid var(--line); cursor: pointer; white-space: nowrap;
+  }
+  thead th.num, td.num{ text-align: right; }
+  thead th .arrow{ opacity: .4; margin-left: 3px; }
+  thead th[aria-sort="ascending"] .arrow, thead th[aria-sort="descending"] .arrow{ opacity: 1; color: var(--accent); }
+  tbody tr{ border-bottom: 1px solid var(--line); cursor: pointer; transition: background .1s; }
+  tbody tr:hover{ background: var(--accent-soft); }
+  tbody tr.selected{ background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+  tbody tr:last-child{ border-bottom: none; }
+  td{ padding: 9px 12px; font-size: .84rem; vertical-align: middle; }
+  td.name{ font-weight: 500; max-width: 260px; }
+
+  .badge{
+    display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px;
+    font-size: .72rem; font-weight: 500; white-space: nowrap;
+  }
+  .badge .dot{ width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .badge.exp-si{ background: var(--accent-soft); color: var(--accent); }
+  .badge.exp-no{ background: transparent; color: var(--ink-400); border: 1px solid var(--line-strong); }
+
+  .score-cell{ display: flex; align-items: center; gap: 8px; }
+  .score-num{ font-weight: 600; width: 26px; text-align: right; }
+  .score-bar{ width: 56px; height: 6px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .score-bar > span{ display: block; height: 100%; border-radius: 4px; }
+
+  .band-pill{ display: inline-flex; align-items:center; gap:5px; padding: 3px 9px; border-radius: 999px; font-size: .72rem; font-weight: 600; }
+  .band-pill .dot{ width: 7px; height: 7px; border-radius: 50%; }
+  .band-alto{ background: var(--status-alto-soft); color: color-mix(in srgb, var(--status-alto) 70%, var(--ink-900) 30%); }
+  .band-alto .dot{ background: var(--status-alto); }
+  .band-medio{ background: var(--status-medio-soft); color: color-mix(in srgb, var(--status-medio) 60%, var(--ink-900) 40%); }
+  .band-medio .dot{ background: var(--status-medio); }
+  .band-bajo{ background: var(--status-bajo-soft); color: var(--ink-600); }
+  .band-bajo .dot{ background: var(--status-bajo); }
+
+  .quick-actions{ display: flex; gap: 6px; }
+  .icon-btn{
+    width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--line-strong);
+    background: var(--surface-raised); display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--ink-600);
+  }
+  .icon-btn:hover{ border-color: var(--accent); color: var(--accent); }
+  .icon-btn[disabled]{ opacity: .3; cursor: not-allowed; }
+  .icon-btn svg{ width: 14px; height: 14px; }
+
+  .empty-row td{ text-align: center; padding: 36px 12px; color: var(--ink-400); }
+
+  /* ---------- Methodology ---------- */
+  details.method{
+    margin-top: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 4px 16px;
+  }
+  details.method summary{ cursor: pointer; padding: 12px 0; font-size: .84rem; font-weight: 600; list-style: none; }
+  details.method summary::-webkit-details-marker{ display: none; }
+  details.method summary::before{ content: "＋ "; color: var(--accent); }
+  details.method[open] summary::before{ content: "－ "; }
+  .method-body{ padding: 0 0 16px; font-size: .84rem; color: var(--ink-600); }
+  .method-body p{ margin: 0 0 10px; }
+  .method-grid{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 10px; margin: 12px 0; }
+  .method-item{ border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .method-item h4{ margin: 0 0 6px; font-size: .78rem; color: var(--ink-900); }
+  .method-item ul{ margin: 0; padding-left: 16px; }
+  .method-item li{ margin-bottom: 2px; }
+  .caveat{ border-left: 3px solid var(--status-medio); padding: 8px 12px; background: var(--status-medio-soft); border-radius: 0 8px 8px 0; }
+
+  footer{ margin-top: 30px; font-size: .75rem; color: var(--ink-400); text-align: center; }
+
+  /* ---------- Drawer ---------- */
+  .scrim{
+    position: fixed; inset: 0; background: rgba(10,10,8,.42); opacity: 0; pointer-events: none;
+    transition: opacity .18s; z-index: 90;
+  }
+  .scrim.open{ opacity: 1; pointer-events: auto; }
+  .drawer{
+    position: fixed; top: 0; right: 0; height: 100%; width: min(420px, 100%);
+    background: var(--surface-raised); border-left: 1px solid var(--line);
+    box-shadow: -18px 0 40px rgba(0,0,0,.18);
+    transform: translateX(100%); transition: transform .22s ease; z-index: 91;
+    display: flex; flex-direction: column;
+  }
+  .drawer.open{ transform: translateX(0); }
+  .drawer-head{ display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 20px 20px 12px; border-bottom: 1px solid var(--line); }
+  .drawer-head h2{ margin: 0 0 8px; font-size: 1.15rem; font-weight: 700; text-wrap: balance; }
+  .drawer-badges{ display: flex; flex-wrap: wrap; gap: 6px; }
+  .drawer-close{ border: none; background: transparent; color: var(--ink-400); cursor: pointer; padding: 6px; border-radius: 6px; flex-shrink: 0; }
+  .drawer-close:hover{ color: var(--ink-900); background: var(--line); }
+  .drawer-body{ padding: 18px 20px 24px; overflow-y: auto; flex: 1; }
+
+  .score-block{ display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .score-ring{
+    width: 74px; height: 74px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 700;
+    background: conic-gradient(var(--ring-color) calc(var(--pct) * 1%), var(--line) 0);
+  }
+  .score-ring-inner{
+    width: 58px; height: 58px; border-radius: 50%; background: var(--surface-raised);
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+  }
+  .score-ring-inner b{ font-size: 1.2rem; line-height: 1; }
+  .score-ring-inner span{ font-size: .58rem; color: var(--ink-400); }
+
+  .breakdown{ margin: 4px 0 18px; }
+  .breakdown-row{ display: flex; align-items: center; gap: 8px; font-size: .78rem; margin-bottom: 6px; }
+  .breakdown-row .lbl{ width: 118px; color: var(--ink-600); flex-shrink: 0; }
+  .breakdown-row .track{ flex: 1; height: 6px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .breakdown-row .track > span{ display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+  .breakdown-row .val{ width: 40px; text-align: right; color: var(--ink-400); }
+
+  .contact-list{ display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .contact-link{
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line-strong);
+    border-radius: 10px; text-decoration: none; color: var(--ink-900); font-size: .84rem;
+  }
+  .contact-link:hover{ border-color: var(--accent); background: var(--accent-soft); }
+  .contact-link.disabled{ opacity: .4; pointer-events: none; }
+  .contact-link svg{ width: 16px; height: 16px; flex-shrink: 0; color: var(--accent); }
+  .contact-link .clabel{ font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-400); display: block; }
+
+  .drawer-actions{ display: flex; gap: 8px; margin-top: 4px; }
+  .btn{
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 11px 12px; border-radius: 9px; font-size: .82rem; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--line-strong); background: var(--surface-raised); color: var(--ink-900);
+  }
+  .btn.primary{ background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .copy-toast{ font-size: .72rem; color: var(--accent); margin-top: 8px; height: 14px; }
+
+  @media (max-width: 860px){
+    header.top{ position: static; backdrop-filter: none; background: var(--bg); }
+    .kpis{ grid-template-columns: repeat(2, 1fr); }
+    .scatter-grid{ grid-template-columns: 1fr; }
+    .plot{ height: 340px; }
+    .search-wrap{ margin-left: 0; width: 100%; }
+    input[type="search"]{ width: 100%; }
+  }
+  @media (max-width: 480px){
+    .top-inner{ padding: 14px 16px 14px; }
+    .shell{ padding: 0 14px 48px; }
+    h1{ font-size: 1.3rem; }
+    .subtitle{ font-size: .86rem; }
+    .kpis{ gap: 8px; }
+    .kpi{ padding: 10px 12px; }
+    .kpi-value{ font-size: 1.25rem; }
+    .filters{ padding: 10px; gap: 6px; }
+    thead th, td{ padding: 8px 9px; font-size: .8rem; }
+    .drawer-head{ padding: 16px 16px 10px; }
+    .drawer-body{ padding: 14px 16px 20px; }
+  }
+  @media (any-pointer: coarse){
+    .icon-btn{ width: 34px; height: 34px; }
+    .dot{ width: 16px; height: 16px; }
+    .chip{ padding: 8px 14px; }
+    .lang-btn{ padding: 9px 15px; }
+    thead th, td{ padding-top: 11px; padding-bottom: 11px; }
+    .drawer-close{ padding: 9px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="top-row">
+      <div class="top-copy">
+        <p class="eyebrow" data-i18n="eyebrow">Identificación de puntos de venta retail · Kazajistán</p>
+        <h1 data-i18n="title">Radar de potencial por punto de venta</h1>
+        <p class="subtitle" data-i18n="subtitle">70 cuentas identificadas en Almaty, Astaná y Shymkent, puntuadas por encaje de categoría, exposición física en tienda y posicionamiento de precio. Filtra, ordena y haz clic en cualquier cuenta para ver el detalle y contactarla.</p>
+      </div>
+      <div class="lang-switch" role="group" aria-label="Language / Idioma / Язык">
+        <button class="lang-btn" data-lang="es" aria-pressed="true">ES</button>
+        <button class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
+        <button class="lang-btn" data-lang="ru" aria-pressed="false">RU</button>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-label" data-i18n="kpi_total">Puntos analizados</div><div class="kpi-value mono tab" id="kpi-total">—</div></div>
+      <div class="kpi"><div class="kpi-label" data-i18n="kpi_alto">Alto potencial</div><div class="kpi-value mono tab" id="kpi-alto">—</div></div>
+      <div class="kpi"><div class="kpi-label" data-i18n="kpi_exposicion">Con exposición física</div><div class="kpi-value mono tab" id="kpi-exp">—</div></div>
+      <div class="kpi"><div class="kpi-label" data-i18n="kpi_ciudades">Ciudades cubiertas</div><div class="kpi-value mono tab" id="kpi-ciudades">—</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+
+  <div class="filters" id="filters">
+    <div class="filter-group">
+      <span class="filter-label" data-i18n="filter_ciudad">Ciudad</span>
+      <select id="f-ciudad">
+        <option value="" data-i18n="opt_todas">Todas</option>
+        <option value="Almaty" data-i18n="city_almaty">Almaty</option>
+        <option value="Astana" data-i18n="city_astana">Astaná</option>
+        <option value="Shymkent" data-i18n="city_shymkent">Shymkent</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label" data-i18n="filter_tipologia">Tipología</span>
+      <button class="chip" data-filter="tipologia" data-value="Interiorismo" aria-pressed="false" style="color:var(--cat-interiorismo)"><span class="dot"></span><span data-i18n="tip_interiorismo">Interiorismo</span></button>
+      <button class="chip" data-filter="tipologia" data-value="Híbrido" aria-pressed="false" style="color:var(--cat-hibrido)"><span class="dot"></span><span data-i18n="tip_hibrido">Híbrido</span></button>
+      <button class="chip" data-filter="tipologia" data-value="Cocina" aria-pressed="false" style="color:var(--cat-cocinabano)"><span class="dot"></span><span data-i18n="tip_cocina">Cocina</span></button>
+      <button class="chip" data-filter="tipologia" data-value="Baño" aria-pressed="false" style="color:var(--cat-cocinabano)"><span class="dot"></span><span data-i18n="tip_bano">Baño</span></button>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label" data-i18n="filter_potencial">Potencial</span>
+      <button class="chip" data-filter="band" data-value="alto" aria-pressed="false" style="color:var(--status-alto)"><span class="dot"></span><span data-i18n="band_alto">Alto</span></button>
+      <button class="chip" data-filter="band" data-value="medio" aria-pressed="false" style="color:var(--status-medio)"><span class="dot"></span><span data-i18n="band_medio">Medio</span></button>
+      <button class="chip" data-filter="band" data-value="bajo" aria-pressed="false" style="color:var(--status-bajo)"><span class="dot"></span><span data-i18n="band_bajo">Bajo</span></button>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label" data-i18n="filter_exposicion">Exposición</span>
+      <select id="f-exposicion">
+        <option value="" data-i18n="opt_todas">Todas</option>
+        <option value="Sí" data-i18n="opt_con_showroom">Con showroom</option>
+        <option value="No" data-i18n="opt_sin_showroom">Sin showroom</option>
+      </select>
+    </div>
+    <div class="search-wrap">
+      <input type="search" id="f-search" data-i18n-placeholder="search_placeholder" data-i18n-aria="search_aria" placeholder="Buscar tienda…" aria-label="Buscar tienda por nombre">
+      <button class="reset-btn" id="reset-filters" data-i18n="reset_filters">Limpiar filtros</button>
+    </div>
+  </div>
+  <p class="result-count" id="result-count"></p>
+
+  <div class="section-head">
+    <span class="section-title" data-i18n="section_positioning">Posicionamiento por ciudad</span>
+    <span class="section-hint" data-i18n="hint_positioning">Eje vertical = índice de potencial · color = segmento · clic en un punto abre el detalle</span>
+  </div>
+  <div class="scatter-card">
+    <div class="scatter-legend">
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--cat-interiorismo)"></span><span data-i18n="legend_interiorismo">Interiorismo</span></span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--cat-hibrido)"></span><span data-i18n="legend_hibrido">Híbrido (distribuidor de superficies)</span></span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--cat-cocinabano)"></span><span data-i18n="legend_cocinabano">Cocina / Baño</span></span>
+      <span class="legend-item ring-note"><span class="legend-swatch"></span><span data-i18n="legend_ring">Contorno de color = banda de potencial</span></span>
+    </div>
+    <div class="scatter-grid" id="scatter-grid"></div>
+  </div>
+
+  <div class="section-head">
+    <span class="section-title" data-i18n="section_ranking">Ranking completo</span>
+    <span class="section-hint" data-i18n="hint_ranking">Clic en encabezado para ordenar</span>
+  </div>
+  <div class="table-card">
+    <div class="table-scroll">
+      <table id="pos-table">
+        <thead>
+          <tr>
+            <th class="num" data-sort="rank"><span class="th-label" data-i18n="col_rank">#</span><span class="arrow">▾</span></th>
+            <th data-sort="nombre"><span class="th-label" data-i18n="col_tienda">Tienda</span><span class="arrow">▾</span></th>
+            <th data-sort="ciudad"><span class="th-label" data-i18n="col_ciudad">Ciudad</span><span class="arrow">▾</span></th>
+            <th data-sort="tipologia"><span class="th-label" data-i18n="col_tipologia">Tipología</span><span class="arrow">▾</span></th>
+            <th data-sort="exposicion"><span class="th-label" data-i18n="col_exposicion">Exposición</span><span class="arrow">▾</span></th>
+            <th data-sort="precio"><span class="th-label" data-i18n="col_precio">Precio</span><span class="arrow">▾</span></th>
+            <th class="num" data-sort="score"><span class="th-label" data-i18n="col_potencial">Potencial</span><span class="arrow">▾</span></th>
+            <th><span class="th-label" data-i18n="col_contacto">Contacto</span></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <details class="method">
+    <summary data-i18n="method_summary">Cómo se calcula el índice de potencial</summary>
+    <div class="method-body">
+      <p data-i18n="method_intro">El dato de origen no incluye una puntuación de potencial ni coordenadas. Este índice (0–100) es una hipótesis de trabajo construida a partir de las tres columnas disponibles, pensada para priorizar la prospección — no un dato de ventas real. Ajusta los pesos con el equipo de Cosentino antes de usarla para decisiones finales.</p>
+      <div class="method-grid">
+        <div class="method-item">
+          <h4 data-i18n="method_fit_title">Encaje de categoría — hasta 40 pts</h4>
+          <ul>
+            <li data-i18n="method_fit_hibrido">Híbrido (ya vende cuarzo/mármol/piedra) — 40</li>
+            <li data-i18n="method_fit_cocina">Cocina — 34</li>
+            <li data-i18n="method_fit_bano">Baño — 30</li>
+            <li data-i18n="method_fit_interiorismo">Interiorismo (prescriptor, no canal directo) — 16</li>
+          </ul>
+        </div>
+        <div class="method-item">
+          <h4 data-i18n="method_exposicion_title">Exposición física — hasta 30 pts</h4>
+          <ul>
+            <li data-i18n="method_exposicion_si">Con showroom / muestra material — 30</li>
+            <li data-i18n="method_exposicion_no">Sin exposición física — 6</li>
+          </ul>
+        </div>
+        <div class="method-item">
+          <h4 data-i18n="method_precio_title">Posicionamiento de precio — hasta 30 pts</h4>
+          <ul>
+            <li data-i18n="method_precio_alto">Alto — 30</li>
+            <li data-i18n="method_precio_mediohigh">Medio-alto — 20</li>
+            <li data-i18n="method_precio_medio">Medio — 10</li>
+          </ul>
+        </div>
+      </div>
+      <p data-i18n="method_bands">Bandas: Alto ≥ 70 · Medio 40–69 · Bajo &lt; 40.</p>
+      <p class="caveat" data-i18n-html="method_caveat"><b>Sobre la ubicación:</b> el dato de origen no trae dirección ni coordenadas, solo ciudad. El «posicionamiento por ciudad» agrupa cada cuenta en su ciudad; el botón «Buscar en Google Maps» del panel de detalle abre una búsqueda por nombre, no un pin verificado. Para un mapa geográfico real haría falta añadir dirección o coordenadas por cuenta.</p>
+    </div>
+  </details>
+
+  <footer data-i18n="footer_text">Radar interno de prospección · generado para uso del equipo comercial · no distribuir fuera de Cosentino sin revisión</footer>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-labelledby="drawer-title">
+  <div class="drawer-head">
+    <div>
+      <h2 id="drawer-title">—</h2>
+      <div class="drawer-badges" id="drawer-badges"></div>
+    </div>
+    <button class="drawer-close" id="drawer-close" data-i18n-aria="drawer_close_label" aria-label="Cerrar detalle">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<script>
+(function(){
+  "use strict";
+
+  var I18N = {
+    es: {
+      doc_title: "Radar POS Kazajistán",
+      eyebrow: "Identificación de puntos de venta retail · Kazajistán",
+      title: "Radar de potencial por punto de venta",
+      subtitle: "70 cuentas identificadas en Almaty, Astaná y Shymkent, puntuadas por encaje de categoría, exposición física en tienda y posicionamiento de precio. Filtra, ordena y haz clic en cualquier cuenta para ver el detalle y contactarla.",
+      kpi_total: "Puntos analizados", kpi_alto: "Alto potencial", kpi_exposicion: "Con exposición física", kpi_ciudades: "Ciudades cubiertas",
+      filter_ciudad: "Ciudad", opt_todas: "Todas", city_almaty: "Almaty", city_astana: "Astaná", city_shymkent: "Shymkent",
+      filter_tipologia: "Tipología", tip_interiorismo: "Interiorismo", tip_hibrido: "Híbrido", tip_cocina: "Cocina", tip_bano: "Baño",
+      filter_potencial: "Potencial", band_alto: "Alto", band_medio: "Medio", band_bajo: "Bajo",
+      filter_exposicion: "Exposición", opt_con_showroom: "Con showroom", opt_sin_showroom: "Sin showroom",
+      search_placeholder: "Buscar tienda…", search_aria: "Buscar tienda por nombre", reset_filters: "Limpiar filtros",
+      result_count: "{n} de {total} puntos de venta",
+      section_positioning: "Posicionamiento por ciudad",
+      hint_positioning: "Eje vertical = índice de potencial · color = segmento · clic en un punto abre el detalle",
+      legend_interiorismo: "Interiorismo", legend_hibrido: "Híbrido (distribuidor de superficies)", legend_cocinabano: "Cocina / Baño",
+      legend_ring: "Contorno de color = banda de potencial",
+      section_ranking: "Ranking completo", hint_ranking: "Clic en encabezado para ordenar",
+      col_rank: "#", col_tienda: "Tienda", col_ciudad: "Ciudad", col_tipologia: "Tipología", col_exposicion: "Exposición",
+      col_precio: "Precio", col_potencial: "Potencial", col_contacto: "Contacto",
+      badge_showroom: "Showroom", badge_sin_showroom: "Sin showroom",
+      empty_state: "Ningún punto de venta coincide con estos filtros.",
+      precio_alto: "Alto", precio_mediohigh: "Medio-Alto", precio_medio: "Medio",
+      cuenta_singular: "cuenta", cuenta_plural: "cuentas",
+      method_summary: "Cómo se calcula el índice de potencial",
+      method_intro: "El dato de origen no incluye una puntuación de potencial ni coordenadas. Este índice (0–100) es una hipótesis de trabajo construida a partir de las tres columnas disponibles, pensada para priorizar la prospección — no un dato de ventas real. Ajusta los pesos con el equipo de Cosentino antes de usarla para decisiones finales.",
+      method_fit_title: "Encaje de categoría — hasta 40 pts",
+      method_fit_hibrido: "Híbrido (ya vende cuarzo/mármol/piedra) — 40", method_fit_cocina: "Cocina — 34",
+      method_fit_bano: "Baño — 30", method_fit_interiorismo: "Interiorismo (prescriptor, no canal directo) — 16",
+      method_exposicion_title: "Exposición física — hasta 30 pts",
+      method_exposicion_si: "Con showroom / muestra material — 30", method_exposicion_no: "Sin exposición física — 6",
+      method_precio_title: "Posicionamiento de precio — hasta 30 pts",
+      method_precio_alto: "Alto — 30", method_precio_mediohigh: "Medio-alto — 20", method_precio_medio: "Medio — 10",
+      method_bands: "Bandas: Alto ≥ 70 · Medio 40–69 · Bajo < 40.",
+      method_caveat: "<b>Sobre la ubicación:</b> el dato de origen no trae dirección ni coordenadas, solo ciudad. El «posicionamiento por ciudad» agrupa cada cuenta en su ciudad; el botón «Buscar en Google Maps» del panel de detalle abre una búsqueda por nombre, no un pin verificado. Para un mapa geográfico real haría falta añadir dirección o coordenadas por cuenta.",
+      footer_text: "Radar interno de prospección · generado para uso del equipo comercial · no distribuir fuera de Cosentino sin revisión",
+      drawer_close_label: "Cerrar detalle",
+      breakdown_fit: "Encaje de categoría", breakdown_exposicion: "Exposición física", breakdown_precio: "Posicionamiento precio",
+      contact_phone: "Teléfono", contact_email: "Email", contact_maps: "Buscar en Google Maps",
+      contact_maps_sub: "Por nombre y ciudad — no es un pin verificado", contact_no_disponible: "No disponible",
+      copy_button: "Copiar ficha de contacto", copy_success: "Copiado al portapapeles.", copy_fail: "No se pudo copiar.",
+      fit_label_hibrido: "Distribuidor de superficies afines", fit_label_cocina: "Canal cocina",
+      fit_label_bano: "Canal baño", fit_label_interiorismo: "Estudio de interiorismo (prescriptor)",
+      score_scale: "/ 100", badge_precio_prefix: "Precio",
+      call_title: "Llamar", call_title_none: "Sin teléfono", mail_title: "Enviar email", mail_title_none: "Sin email"
+    },
+    en: {
+      doc_title: "Kazakhstan POS Radar",
+      eyebrow: "Retail point-of-sale identification · Kazakhstan",
+      title: "Point-of-sale potential radar",
+      subtitle: "70 accounts identified across Almaty, Astana and Shymkent, scored by category fit, physical showroom exposure and price positioning. Filter, sort and click any account to see the detail and contact it.",
+      kpi_total: "Points analyzed", kpi_alto: "High potential", kpi_exposicion: "With physical exposure", kpi_ciudades: "Cities covered",
+      filter_ciudad: "City", opt_todas: "All", city_almaty: "Almaty", city_astana: "Astana", city_shymkent: "Shymkent",
+      filter_tipologia: "Category", tip_interiorismo: "Interior design", tip_hibrido: "Hybrid", tip_cocina: "Kitchen", tip_bano: "Bathroom",
+      filter_potencial: "Potential", band_alto: "High", band_medio: "Medium", band_bajo: "Low",
+      filter_exposicion: "Exposure", opt_con_showroom: "Has showroom", opt_sin_showroom: "No showroom",
+      search_placeholder: "Search store…", search_aria: "Search store by name", reset_filters: "Clear filters",
+      result_count: "{n} of {total} points of sale",
+      section_positioning: "Positioning by city",
+      hint_positioning: "Vertical axis = potential index · color = segment · click a point to open the detail",
+      legend_interiorismo: "Interior design", legend_hibrido: "Hybrid (surface dealer)", legend_cocinabano: "Kitchen / Bathroom",
+      legend_ring: "Ring color = potential band",
+      section_ranking: "Full ranking", hint_ranking: "Click a header to sort",
+      col_rank: "#", col_tienda: "Store", col_ciudad: "City", col_tipologia: "Category", col_exposicion: "Exposure",
+      col_precio: "Price", col_potencial: "Potential", col_contacto: "Contact",
+      badge_showroom: "Showroom", badge_sin_showroom: "No showroom",
+      empty_state: "No points of sale match these filters.",
+      precio_alto: "High", precio_mediohigh: "Medium-High", precio_medio: "Medium",
+      cuenta_singular: "account", cuenta_plural: "accounts",
+      method_summary: "How the potential index is calculated",
+      method_intro: "The source data does not include a potential score or coordinates. This index (0–100) is a working hypothesis built from the three available columns, meant to prioritize outreach — not real sales data. Adjust the weights with the Cosentino team before using it for final decisions.",
+      method_fit_title: "Category fit — up to 40 pts",
+      method_fit_hibrido: "Hybrid (already sells quartz/marble/stone) — 40", method_fit_cocina: "Kitchen — 34",
+      method_fit_bano: "Bathroom — 30", method_fit_interiorismo: "Interior design (specifier, not a direct channel) — 16",
+      method_exposicion_title: "Physical exposure — up to 30 pts",
+      method_exposicion_si: "Showroom / displays material — 30", method_exposicion_no: "No physical exposure — 6",
+      method_precio_title: "Price positioning — up to 30 pts",
+      method_precio_alto: "High — 30", method_precio_mediohigh: "Medium-high — 20", method_precio_medio: "Medium — 10",
+      method_bands: "Bands: High ≥ 70 · Medium 40–69 · Low < 40.",
+      method_caveat: "<b>On location:</b> the source data has no address or coordinates, only city. \"Positioning by city\" groups each account by its city; the \"Search on Google Maps\" button in the detail panel opens a name search, not a verified pin. A real geographic map would need an address or coordinates per account.",
+      footer_text: "Internal prospecting radar · built for the sales team · not for distribution outside Cosentino without review",
+      drawer_close_label: "Close detail",
+      breakdown_fit: "Category fit", breakdown_exposicion: "Physical exposure", breakdown_precio: "Price positioning",
+      contact_phone: "Phone", contact_email: "Email", contact_maps: "Search on Google Maps",
+      contact_maps_sub: "By name and city — not a verified pin", contact_no_disponible: "Not available",
+      copy_button: "Copy contact card", copy_success: "Copied to clipboard.", copy_fail: "Couldn't copy.",
+      fit_label_hibrido: "Adjacent surface dealer", fit_label_cocina: "Kitchen channel",
+      fit_label_bano: "Bathroom channel", fit_label_interiorismo: "Interior design studio (specifier)",
+      score_scale: "/ 100", badge_precio_prefix: "Price",
+      call_title: "Call", call_title_none: "No phone", mail_title: "Send email", mail_title_none: "No email"
+    },
+    ru: {
+      doc_title: "Радар точек продаж Казахстана",
+      eyebrow: "Идентификация розничных точек продаж · Казахстан",
+      title: "Радар потенциала точек продаж",
+      subtitle: "70 контрагентов в Алматы, Астане и Шымкенте, оценённых по соответствию категории, наличию шоурума и ценовому позиционированию. Фильтруйте, сортируйте и кликайте по любому контрагенту, чтобы увидеть детали и связаться.",
+      kpi_total: "Проанализировано точек", kpi_alto: "Высокий потенциал", kpi_exposicion: "С шоурумом", kpi_ciudades: "Городов охвачено",
+      filter_ciudad: "Город", opt_todas: "Все", city_almaty: "Алматы", city_astana: "Астана", city_shymkent: "Шымкент",
+      filter_tipologia: "Категория", tip_interiorismo: "Дизайн интерьера", tip_hibrido: "Гибрид", tip_cocina: "Кухня", tip_bano: "Ванная",
+      filter_potencial: "Потенциал", band_alto: "Высокий", band_medio: "Средний", band_bajo: "Низкий",
+      filter_exposicion: "Шоурум", opt_con_showroom: "С шоурумом", opt_sin_showroom: "Без шоурума",
+      search_placeholder: "Поиск магазина…", search_aria: "Поиск магазина по названию", reset_filters: "Сбросить фильтры",
+      result_count: "{n} из {total} точек продаж",
+      section_positioning: "Позиционирование по городам",
+      hint_positioning: "Вертикальная ось = индекс потенциала · цвет = сегмент · клик по точке открывает детали",
+      legend_interiorismo: "Дизайн интерьера", legend_hibrido: "Гибрид (дилер поверхностей)", legend_cocinabano: "Кухня / Ванная",
+      legend_ring: "Цвет обводки = уровень потенциала",
+      section_ranking: "Полный рейтинг", hint_ranking: "Клик по заголовку — сортировка",
+      col_rank: "#", col_tienda: "Магазин", col_ciudad: "Город", col_tipologia: "Категория", col_exposicion: "Шоурум",
+      col_precio: "Цена", col_potencial: "Потенциал", col_contacto: "Контакт",
+      badge_showroom: "Шоурум", badge_sin_showroom: "Без шоурума",
+      empty_state: "Нет точек продаж, соответствующих этим фильтрам.",
+      precio_alto: "Высокий", precio_mediohigh: "Средне-высокий", precio_medio: "Средний",
+      cuenta_singular: "точка", cuenta_plural: "точек",
+      method_summary: "Как рассчитывается индекс потенциала",
+      method_intro: "Исходные данные не содержат оценки потенциала или координат. Этот индекс (0–100) — рабочая гипотеза, построенная на трёх доступных столбцах, чтобы приоритизировать контакты, а не отражающая реальные данные о продажах. Согласуйте веса с командой Cosentino перед принятием решений.",
+      method_fit_title: "Соответствие категории — до 40 баллов",
+      method_fit_hibrido: "Гибрид (уже продаёт кварц/мрамор/камень) — 40", method_fit_cocina: "Кухня — 34",
+      method_fit_bano: "Ванная — 30", method_fit_interiorismo: "Дизайн интерьера (специфаер, не прямой канал) — 16",
+      method_exposicion_title: "Физическое присутствие — до 30 баллов",
+      method_exposicion_si: "Шоурум / демонстрация материала — 30", method_exposicion_no: "Нет физического присутствия — 6",
+      method_precio_title: "Ценовое позиционирование — до 30 баллов",
+      method_precio_alto: "Высокий — 30", method_precio_mediohigh: "Средне-высокий — 20", method_precio_medio: "Средний — 10",
+      method_bands: "Уровни: высокий ≥ 70 · средний 40–69 · низкий < 40.",
+      method_caveat: "<b>О местоположении:</b> исходные данные не содержат адреса или координат, только город. «Позиционирование по городам» группирует каждого контрагента по его городу; кнопка «Искать в Google Maps» в панели деталей открывает поиск по названию, а не проверенную метку. Для настоящей геокарты потребуется указать адрес или координаты каждой точки.",
+      footer_text: "Внутренний радар для поиска точек продаж · подготовлено для отдела продаж · не распространять за пределами Cosentino без проверки",
+      drawer_close_label: "Закрыть детали",
+      breakdown_fit: "Соответствие категории", breakdown_exposicion: "Физическое присутствие", breakdown_precio: "Ценовое позиционирование",
+      contact_phone: "Телефон", contact_email: "Email", contact_maps: "Искать в Google Maps",
+      contact_maps_sub: "По названию и городу — не проверенная метка", contact_no_disponible: "Недоступно",
+      copy_button: "Скопировать карточку контакта", copy_success: "Скопировано в буфер обмена.", copy_fail: "Не удалось скопировать.",
+      fit_label_hibrido: "Дилер смежных поверхностей", fit_label_cocina: "Канал «кухня»",
+      fit_label_bano: "Канал «ванная»", fit_label_interiorismo: "Студия дизайна интерьера (специфаер)",
+      score_scale: "/ 100", badge_precio_prefix: "Цена",
+      call_title: "Позвонить", call_title_none: "Нет телефона", mail_title: "Написать email", mail_title_none: "Нет email"
+    }
+  };
+
+  var currentLang = "es";
+  function t(key){ return (I18N[currentLang] && I18N[currentLang][key] !== undefined) ? I18N[currentLang][key] : (I18N.es[key] || key); }
+
+  function detectLang(){
+    try {
+      var saved = localStorage.getItem("kz_pos_lang");
+      if (saved && I18N[saved]) return saved;
+    } catch(e){}
+    var nav = ((navigator.language || navigator.userLanguage || "es") + "").slice(0,2).toLowerCase();
+    if (I18N[nav]) return nav;
+    return "es";
+  }
+
+  // [nombre, ciudad, tipologia, exposicion, precio, telefono, email]
+  var RAW = [["Design Republic","Almaty","Interiorismo","No","Alto","8 700 303 5000",""],["Brain Twister (BrainTwister.design)","Almaty","Interiorismo","No","Alto","+7 701 173 99 91 / +7 702 777 13 41","brain_twister@mail.ru"],["Blackspace","Almaty","Interiorismo","No","Medio-Alto","+7 707 429 77 99","blackspacedsgn@gmail.com"],["Studio Mint Almaty (Студия дизайна Мята)","Almaty","Interiorismo","No","Alto","","office@studio-mint.ru"],["Design-Interior.kz","Almaty","Interiorismo","No","Medio-Alto","+7 771 851 77 77",""],["Boiko Architects","Almaty","Interiorismo","No","Alto","+7 701 218 60 43",""],["Renovatio Design","Almaty","Interiorismo","No","Alto","+7 778 476 72 66","renovatio.design.kz@gmail.com"],["DiAmir Interiors","Almaty","Interiorismo","No","Alto","+7 701 772 81 87",""],["QUB Architects","Almaty","Interiorismo","No","Alto","+7 707 070 50 77",""],["Khalansky Architects","Almaty","Interiorismo","No","Alto","",""],["IDAL Concept","Almaty","Interiorismo","No","Medio-Alto","",""],["Lux House (Almaty architecture bureau)","Almaty","Interiorismo","No","Medio-Alto","+7 777 348 10 47","luxhouse_s@mail.ru"],["Woodlife (bathroom interior design)","Almaty","Baño","No","Medio-Alto","+7 700 5555 999",""],["TS2S (Дизайн офиса, ресторана, квартиры, дома)","Almaty","Interiorismo","No","Medio-Alto","+7 778 537 03 94",""],["Interstone (Caesarstone / Grandex Quartz official dealer)","Almaty","Híbrido","Sí","Alto","",""],["Glory Stone","Almaty","Híbrido","Sí","Alto","+7 707 840 10 00",""],["Verona Stone","Almaty","Híbrido","Sí","Medio-Alto","+7 702 218 22 38","masterstone@yandex.kz"],["QStone","Almaty","Híbrido","Sí","Medio","+7 700 600 57 86",""],["Luxury Stone (LuxuryStone.kz)","Almaty","Híbrido","Sí","Alto","+7 777 010 45 45",""],["Ark Stone Group (Mramor.kz)","Almaty","Híbrido","Sí","Medio-Alto","",""],["Mir Mramora (World of Marble)","Almaty","Híbrido","Sí","Medio-Alto","+7 776 175 25 55",""],["Stonex Group","Almaty","Híbrido","Sí","Medio-Alto","+7 700 607 70 87",""],["Stonehead Almaty","Almaty","Híbrido","Sí","Medio-Alto","",""],["Unique KZ (Unique-Co)","Almaty","Híbrido","Sí","Medio-Alto","+7 702 218 19 15",""],["Italon Experience Almaty","Almaty","Híbrido","Sí","Alto","+7 727 339 84 75","sales@salonatmosfera.kz"],["Kerama Marazzi KZ","Almaty","Híbrido","Sí","Medio-Alto","+7 727 310 88 88 / +7 771 705 17 47","info@keramacenter.com"],["Lady Plitka","Almaty","Híbrido","Sí","Medio","+7 708 845 86 73 / +7 771 376 50 14","info@ladyplitka.kz"],["Kitchen House","Almaty","Cocina","Sí","Medio","+7 707 194 48 56",""],["Sanni Kitchens","Almaty","Cocina","Sí","Medio","+7 727 378 92 94 / +7 707 194 48 56",""],["Maxxfine (MaxFine showroom - Valcucine / Inalco / FMG / Rimadesio)","Almaty","Híbrido","Sí","Alto","+7 776 444 77 03 / +7 771 768 99 49","maxxfine.furniture@gmail.com"],["Solemio (Sole Mio Arredamenti - Antonio Lupi dealer)","Almaty","Baño","Sí","Alto","",""],["Deluxe House (DH-Studio)","Astana","Interiorismo","No","Alto","+7 700 300-03-40",""],["White Cube","Astana","Interiorismo","No","Medio-Alto","+7 707 665-27-28",""],["Biar Studio","Astana","Interiorismo","No","Medio","+7 778 000-08-34","info@biar.kz"],["Antonovych Design","Astana","Interiorismo","No","Alto","+7 776 111-01-25",""],["Clever Design","Astana","Interiorismo","No","Medio","+7 702 094-70-22",""],["Bayakov Architectural Studio (Arman Bayakov)","Astana","Interiorismo","No","Medio","+7 705 290-06-06",""],["Luxhouse (Lux-House Architectural Bureau)","Astana","Interiorismo","No","Alto","+7 777 348-10-47","luxhouse_s@mail.ru"],["Aiziya Shayakhmet Interiors","Astana","Interiorismo","No","Alto","+7 702 311-88-80",""],["Design Republic","Astana","Interiorismo","No","Alto","+7 700 303-5000",""],["Kvadrat Architects","Astana","Interiorismo","No","Alto","+7 701 255-36-46",""],["Design Store","Astana","Interiorismo","No","Medio-Alto","+7 701 300-58-80",""],["Mon.Arch","Astana","Interiorismo","No","Alto","+7 702 069-29-93","info@mon-arch.kz"],["Aulet Architecture","Astana","Interiorismo","No","Alto","+7 701 070-04-01",""],["Artidea","Astana","Interiorismo","No","Medio-Alto","+7 701 362-87-88",""],["Astana Quartz","Astana","Híbrido","Sí","Medio","+7 700 505-01-24",""],["Interstone","Astana","Híbrido","Sí","Alto","+7 707 840-10-00",""],["Natural Stone Astana","Astana","Híbrido","Sí","Medio-Alto","+7 701 726-39-42",""],["Tasplus","Astana","Híbrido","Sí","Alto","",""],["MakStone","Astana","Híbrido","Sí","Medio-Alto","",""],["Big Tile","Astana","Híbrido","Sí","Alto","+7 776 108-00-00",""],["Italon Experience Astana","Astana","Híbrido","Sí","Alto","+7 7017 575-201","Dirkz@palazzo.pro"],["Costa Ceramica (Astana showroom)","Astana","Híbrido","Sí","Medio-Alto","+7 714 256-64-17","info@costaceramica.kz"],["Ceramo Stone Group","Astana","Híbrido","Sí","Alto","+7 701 643-74-19",""],["Poliform Astana","Astana","Híbrido","Sí","Alto","+7 776 465-88-33","info@poliform.kz"],["Invogue (B&B Italia Astana)","Astana","Interiorismo","Sí","Alto","",""],["Akniet","Astana","Interiorismo","Sí","Alto","+7 727 258-85-66","marketing@akniet.kz"],["MK Mebel","Astana","Híbrido","Sí","Medio-Alto","+7 778 344-12-21",""],["Infatti","Astana","Baño","Sí","Alto","+7 747 517-75-13","info@infatti.ru"],["Neoceramica Astana","Astana","Baño","Sí","Medio","+7 707 380-99-80",""],["INTERSTONE (Shymkent branch)","Shymkent","Híbrido","Sí","Medio","+7 707 840 10 00","office@interstone.kz"],["IMPRESSIVE (Impressive Home)","Shymkent","Interiorismo","No","Alto","",""],["DiNatale","Shymkent","Interiorismo","No","Medio-Alto","",""],["Radiance Plus","Shymkent","Interiorismo","No","Medio","+7 707 280 0063","radianceplus@yandex.kz"],["Creative Home","Shymkent","Interiorismo","No","Medio-Alto","+7 778 323 3635",""],["The Modern Design Studio (@designer_bereke)","Shymkent","Interiorismo","No","Medio-Alto","+7 777 966 9222",""],["MARSA (design & architecture studio, @design_marsa)","Shymkent","Interiorismo","No","Alto","",""],["Gulvira group","Shymkent","Interiorismo","No","Medio-Alto","+7 701 132 8391",""],["Premium Home (@premium_space.kz)","Shymkent","Interiorismo","Sí","Alto","+7 700 827 2222",""],["Koleso Design (@koleso.design)","Shymkent","Interiorismo","No","Medio","",""]];
+
+  var FIT = { "Híbrido": 40, "Cocina": 34, "Baño": 30, "Interiorismo": 16 };
+  var FIT_KEY = { "Híbrido": "hibrido", "Cocina": "cocina", "Baño": "bano", "Interiorismo": "interiorismo" };
+  var EXP = { "Sí": 30, "No": 6 };
+  var PRECIO = { "Alto": 30, "Medio-Alto": 20, "Medio": 10 };
+  var PRECIO_KEY = { "Alto": "precio_alto", "Medio-Alto": "precio_mediohigh", "Medio": "precio_medio" };
+  var CITY_KEY = { "Almaty": "city_almaty", "Astana": "city_astana", "Shymkent": "city_shymkent" };
+  var TIP_KEY = { "Interiorismo": "tip_interiorismo", "Híbrido": "tip_hibrido", "Cocina": "tip_cocina", "Baño": "tip_bano" };
+  var CAT_COLOR_VAR = { "Interiorismo": "--cat-interiorismo", "Híbrido": "--cat-hibrido", "Cocina": "--cat-cocinabano", "Baño": "--cat-cocinabano" };
+
+  function scoreOf(r){ return (FIT[r.tipologia]||0) + (EXP[r.exposicion]||0) + (PRECIO[r.precio]||0); }
+  function bandOf(score){ if (score >= 70) return "alto"; if (score >= 40) return "medio"; return "bajo"; }
+  function bandLabel(b){ return t("band_" + b); }
+  function cityLabel(c){ return t(CITY_KEY[c] || c); }
+  function tipLabel(tp){ return t(TIP_KEY[tp] || tp); }
+  function precioLabel(p){ return t(PRECIO_KEY[p] || p); }
+
+  var DATA = RAW.map(function(r, i){
+    var o = { id: i, nombre: r[0], ciudad: r[1], tipologia: r[2], exposicion: r[3], precio: r[4], telefono: r[5] || "", email: r[6] || "" };
+    o.score = scoreOf(o);
+    o.band = bandOf(o.score);
+    return o;
+  });
+
+  function cssColor(varName){ return getComputedStyle(document.documentElement).getPropertyValue(varName).trim(); }
+  function catColor(tip){ return cssColor(CAT_COLOR_VAR[tip] || "--ink-400"); }
+  function bandColor(band){ return cssColor("--status-" + band); }
+
+  document.getElementById("kpi-total").textContent = DATA.length;
+  document.getElementById("kpi-alto").textContent = DATA.filter(function(d){ return d.band === "alto"; }).length;
+  document.getElementById("kpi-exp").textContent = DATA.filter(function(d){ return d.exposicion === "Sí"; }).length;
+  document.getElementById("kpi-ciudades").textContent = new Set(DATA.map(function(d){ return d.ciudad; })).size;
+
+  var state = { ciudad: "", exposicion: "", search: "", tipologias: new Set(), bands: new Set(), sortKey: "score", sortDir: "desc" };
+  var selectedId = null;
+
+  function applyFilters(){
+    return DATA.filter(function(d){
+      if (state.ciudad && d.ciudad !== state.ciudad) return false;
+      if (state.exposicion && d.exposicion !== state.exposicion) return false;
+      if (state.tipologias.size && !state.tipologias.has(d.tipologia)) return false;
+      if (state.bands.size && !state.bands.has(d.band)) return false;
+      if (state.search && d.nombre.toLowerCase().indexOf(state.search) === -1) return false;
+      return true;
+    });
+  }
+
+  function sortRows(rows){
+    var key = state.sortKey, dir = state.sortDir === "asc" ? 1 : -1;
+    var ranked = DATA.slice().sort(function(a,b){ return b.score - a.score; });
+    var rankMap = {}; ranked.forEach(function(d,i){ rankMap[d.id] = i+1; });
+    rows.forEach(function(d){ d._rank = rankMap[d.id]; });
+    return rows.slice().sort(function(a,b){
+      var va, vb;
+      switch(key){
+        case "rank": va = a._rank; vb = b._rank; break;
+        case "nombre": va = a.nombre.toLowerCase(); vb = b.nombre.toLowerCase(); break;
+        case "ciudad": va = cityLabel(a.ciudad).toLowerCase(); vb = cityLabel(b.ciudad).toLowerCase(); break;
+        case "tipologia": va = tipLabel(a.tipologia).toLowerCase(); vb = tipLabel(b.tipologia).toLowerCase(); break;
+        case "exposicion": va = a.exposicion; vb = b.exposicion; break;
+        case "precio": va = PRECIO[a.precio]; vb = PRECIO[b.precio]; break;
+        default: va = a.score; vb = b.score;
+      }
+      if (va < vb) return -1 * dir;
+      if (va > vb) return 1 * dir;
+      return a.nombre.localeCompare(b.nombre);
+    });
+  }
+
+  var tbody = document.getElementById("table-body");
+  var resultCount = document.getElementById("result-count");
+
+  function phoneHref(tel){ return "tel:" + tel.split(" / ")[0].replace(/[^\d+]/g, ""); }
+  function escapeHtml(s){ var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+  function renderTable(rows){
+    tbody.innerHTML = "";
+    resultCount.textContent = t("result_count").replace("{n}", rows.length).replace("{total}", DATA.length);
+    if (!rows.length){
+      var tr = document.createElement("tr");
+      tr.className = "empty-row";
+      var td = document.createElement("td");
+      td.colSpan = 8; td.textContent = t("empty_state");
+      tr.appendChild(td); tbody.appendChild(tr);
+      return;
+    }
+    var sorted = sortRows(rows);
+    sorted.forEach(function(d){
+      var tr = document.createElement("tr");
+      tr.dataset.id = d.id;
+      if (d.id === selectedId) tr.classList.add("selected");
+      var catVar = CAT_COLOR_VAR[d.tipologia];
+      var expBadge = d.exposicion === "Sí"
+        ? '<span class="badge exp-si"><span class="dot"></span>' + t("badge_showroom") + '</span>'
+        : '<span class="badge exp-no">' + t("badge_sin_showroom") + '</span>';
+      tr.innerHTML =
+        '<td class="num mono tab">' + d._rank + '</td>' +
+        '<td class="name">' + escapeHtml(d.nombre) + '</td>' +
+        '<td>' + cityLabel(d.ciudad) + '</td>' +
+        '<td><span class="badge" style="color:var(' + catVar + ');background:color-mix(in srgb, var(' + catVar + ') 16%, transparent)"><span class="dot"></span>' + tipLabel(d.tipologia) + '</span></td>' +
+        '<td>' + expBadge + '</td>' +
+        '<td>' + precioLabel(d.precio) + '</td>' +
+        '<td class="num"><div class="score-cell"><span class="score-num mono tab">' + d.score + '</span><span class="score-bar"><span style="width:' + d.score + '%;background:var(--status-' + d.band + ')"></span></span></div></td>' +
+        '<td><div class="quick-actions"></div></td>';
+
+      var qa = tr.querySelector(".quick-actions");
+      qa.appendChild(makeQuickBtn("call", d.telefono, d.telefono ? phoneHref(d.telefono) : ""));
+      qa.appendChild(makeQuickBtn("mail", d.email, d.email ? "mailto:" + d.email : ""));
+
+      tr.addEventListener("click", function(){ openDrawer(d.id); });
+      tbody.appendChild(tr);
+    });
+  }
+
+  function makeQuickBtn(kind, value, href){
+    var btn = document.createElement(value ? "a" : "button");
+    btn.className = "icon-btn";
+    if (value){ btn.href = href; btn.target = "_blank"; btn.rel = "noopener"; }
+    else { btn.disabled = true; }
+    btn.title = kind === "call" ? (value ? t("call_title") : t("call_title_none")) : (value ? t("mail_title") : t("mail_title_none"));
+    btn.addEventListener("click", function(e){ e.stopPropagation(); });
+    btn.innerHTML = kind === "call"
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>';
+    return btn;
+  }
+
+  var scatterGrid = document.getElementById("scatter-grid");
+  var CITIES = ["Almaty", "Astana", "Shymkent"];
+  var LANES = ["Interiorismo", "Híbrido", "Cocina"];
+  function laneOf(tip){ return tip === "Baño" ? "Cocina" : tip; }
+
+  function buildScatterSkeleton(){
+    scatterGrid.innerHTML = "";
+    CITIES.forEach(function(city){
+      var col = document.createElement("div");
+      col.className = "city-col";
+      col.innerHTML = '<h3>' + cityLabel(city) + '</h3><div class="city-n" data-city-n="' + city + '"></div><div class="plot" data-city="' + city + '"></div>';
+      scatterGrid.appendChild(col);
+      var plot = col.querySelector(".plot");
+      [0,25,50,75,100].forEach(function(v){
+        var gl = document.createElement("div");
+        gl.className = "gridline";
+        gl.style.bottom = v + "%";
+        gl.innerHTML = "<span>" + v + "</span>";
+        plot.appendChild(gl);
+      });
+    });
+  }
+
+  function pluralCuentas(n){
+    if (currentLang === "ru"){
+      var mod10 = n % 10, mod100 = n % 100;
+      if (mod10 === 1 && mod100 !== 11) return n + " точка";
+      if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return n + " точки";
+      return n + " точек";
+    }
+    return n + " " + (n === 1 ? t("cuenta_singular") : t("cuenta_plural"));
+  }
+
+  function renderScatter(rows){
+    var byCity = {};
+    CITIES.forEach(function(c){ byCity[c] = []; });
+    rows.forEach(function(d){ if (byCity[d.ciudad]) byCity[d.ciudad].push(d); });
+
+    CITIES.forEach(function(city){
+      var plot = scatterGrid.querySelector('.plot[data-city="' + city + '"]');
+      var nEl = scatterGrid.querySelector('[data-city-n="' + city + '"]');
+      var pts = byCity[city];
+      nEl.textContent = pluralCuentas(pts.length);
+
+      var existing = {};
+      Array.prototype.slice.call(plot.querySelectorAll(".dot")).forEach(function(el){ existing[el.dataset.id] = el; });
+
+      var laneCounts = { "Interiorismo": [], "Híbrido": [], "Cocina": [] };
+      pts.forEach(function(d){ laneCounts[laneOf(d.tipologia)].push(d); });
+
+      var seen = {};
+      LANES.forEach(function(lane, li){
+        var group = laneCounts[lane];
+        var laneCenter = (li + 0.5) / LANES.length * 100;
+        group.forEach(function(d, gi){
+          seen[d.id] = true;
+          var spread = Math.min(group.length, 9);
+          var jitter = ((gi % spread) - (spread-1)/2) * (26 / LANES.length / Math.max(1,spread-1||1));
+          var x = Math.max(6, Math.min(94, laneCenter + jitter));
+          var el = existing[d.id];
+          if (!el){
+            el = document.createElement("div");
+            el.className = "dot";
+            el.dataset.id = d.id;
+            el.tabIndex = 0;
+            el.setAttribute("role", "button");
+            plot.appendChild(el);
+            el.addEventListener("click", function(){ openDrawer(d.id); });
+            el.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); openDrawer(d.id); } });
+            el.addEventListener("mouseenter", function(e){ showTooltip(e, d); });
+            el.addEventListener("mousemove", moveTooltip);
+            el.addEventListener("mouseleave", hideTooltip);
+          }
+          el.setAttribute("aria-label", d.nombre + " — " + t("col_potencial") + " " + d.score + "/100");
+          el.style.left = x + "%";
+          el.style.bottom = d.score + "%";
+          el.style.background = catColor(d.tipologia);
+          el.style.boxShadow = "0 0 0 2px " + bandColor(d.band) + (d.id === selectedId ? ", 0 0 0 4px var(--surface)" : "");
+          el.classList.toggle("selected", d.id === selectedId);
+        });
+      });
+
+      Object.keys(existing).forEach(function(id){ if (!seen[id]) existing[id].remove(); });
+    });
+  }
+
+  var tooltip = document.getElementById("tooltip");
+  function showTooltip(e, d){
+    tooltip.innerHTML = "<b>" + escapeHtml(d.nombre) + "</b>" +
+      '<div class="tt-row">' + cityLabel(d.ciudad) + ' · ' + tipLabel(d.tipologia) + '</div>' +
+      '<div class="tt-row">' + t("col_potencial") + ': ' + d.score + '/100 (' + bandLabel(d.band) + ')</div>';
+    tooltip.classList.add("show");
+    moveTooltip(e);
+  }
+  function moveTooltip(e){
+    var pad = 14;
+    var x = e.clientX + pad, y = e.clientY + pad;
+    if (x + 240 > window.innerWidth) x = e.clientX - 240 - pad;
+    if (y + 70 > window.innerHeight) y = e.clientY - 70 - pad;
+    tooltip.style.left = x + "px";
+    tooltip.style.top = y + "px";
+  }
+  function hideTooltip(){ tooltip.classList.remove("show"); }
+
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var drawerBody = document.getElementById("drawer-body");
+  var drawerTitle = document.getElementById("drawer-title");
+  var drawerBadges = document.getElementById("drawer-badges");
+  var lastFocused = null;
+
+  function breakdownRow(label, val, max){
+    return '<div class="breakdown-row"><span class="lbl">' + label + '</span><span class="track"><span style="width:' + (val/max*100) + '%"></span></span><span class="val mono tab">' + val + '/' + max + '</span></div>';
+  }
+
+  function openDrawer(id){
+    var d = DATA.filter(function(x){ return x.id === id; })[0];
+    if (!d) return;
+    selectedId = id;
+    lastFocused = document.activeElement;
+
+    drawerTitle.textContent = d.nombre;
+    var catVar = CAT_COLOR_VAR[d.tipologia];
+    drawerBadges.innerHTML =
+      '<span class="badge" style="background:var(--accent-soft);color:var(--accent)">' + cityLabel(d.ciudad) + '</span>' +
+      '<span class="badge" style="color:var(' + catVar + ');background:color-mix(in srgb, var(' + catVar + ') 16%, transparent)">' + tipLabel(d.tipologia) + '</span>' +
+      '<span class="badge ' + (d.exposicion === "Sí" ? "exp-si" : "exp-no") + '">' + (d.exposicion === "Sí" ? t("badge_showroom") : t("badge_sin_showroom")) + '</span>' +
+      '<span class="badge" style="border:1px solid var(--line-strong)">' + t("badge_precio_prefix") + ' ' + precioLabel(d.precio) + '</span>';
+
+    var pct = d.score;
+    var ringColor = bandColor(d.band);
+    var fitPts = FIT[d.tipologia] || 0, expPts = EXP[d.exposicion] || 0, precioPts = PRECIO[d.precio] || 0;
+
+    var mapsQuery = encodeURIComponent(d.nombre + ", " + d.ciudad + ", Kazakhstan");
+    var telHref = d.telefono ? phoneHref(d.telefono) : "";
+    var mailHref = d.email ? "mailto:" + d.email : "";
+
+    drawerBody.innerHTML =
+      '<div class="score-block">' +
+        '<div class="score-ring" style="--pct:' + pct + ';--ring-color:' + ringColor + '"><div class="score-ring-inner"><b class="mono">' + pct + '</b><span>' + t("score_scale") + '</span></div></div>' +
+        '<div><span class="band-pill band-' + d.band + '"><span class="dot"></span>' + t("filter_potencial") + ' ' + bandLabel(d.band) + '</span>' +
+        '<p style="margin:8px 0 0;font-size:.78rem;color:var(--ink-600)">' + t("fit_label_" + FIT_KEY[d.tipologia]) + '</p></div>' +
+      '</div>' +
+      '<div class="breakdown">' +
+        breakdownRow(t("breakdown_fit"), fitPts, 40) +
+        breakdownRow(t("breakdown_exposicion"), expPts, 30) +
+        breakdownRow(t("breakdown_precio"), precioPts, 30) +
+      '</div>' +
+      '<div class="contact-list">' +
+        '<a class="contact-link ' + (telHref ? "" : "disabled") + '" href="' + telHref + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' +
+          '<span><span class="clabel">' + t("contact_phone") + '</span>' + (d.telefono || t("contact_no_disponible")) + '</span>' +
+        '</a>' +
+        '<a class="contact-link ' + (mailHref ? "" : "disabled") + '" href="' + mailHref + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>' +
+          '<span><span class="clabel">' + t("contact_email") + '</span>' + (d.email || t("contact_no_disponible")) + '</span>' +
+        '</a>' +
+        '<a class="contact-link" href="https://www.google.com/maps/search/?api=1&query=' + mapsQuery + '" target="_blank" rel="noopener">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+          '<span><span class="clabel">' + t("contact_maps") + '</span>' + t("contact_maps_sub") + '</span>' +
+        '</a>' +
+      '</div>' +
+      '<div class="drawer-actions">' +
+        '<button class="btn primary" id="copy-contact">' + t("copy_button") + '</button>' +
+      '</div>' +
+      '<div class="copy-toast" id="copy-toast"></div>';
+
+    document.getElementById("copy-contact").addEventListener("click", function(){
+      var text = [
+        d.nombre,
+        cityLabel(d.ciudad) + " · " + tipLabel(d.tipologia),
+        t("contact_phone") + ": " + (d.telefono || "—"),
+        t("contact_email") + ": " + (d.email || "—"),
+        t("col_potencial") + ": " + d.score + "/100 (" + bandLabel(d.band) + ")"
+      ].join("\n");
+      var toast = document.getElementById("copy-toast");
+      try {
+        navigator.clipboard.writeText(text)
+          .then(function(){ toast.textContent = t("copy_success"); })
+          .catch(function(){ toast.textContent = t("copy_fail"); });
+      } catch(err){ toast.textContent = t("copy_fail"); }
+    });
+
+    drawer.classList.add("open");
+    scrim.classList.add("open");
+    drawer.setAttribute("aria-hidden", "false");
+    document.getElementById("drawer-close").focus();
+    renderAll();
+  }
+
+  function closeDrawer(){
+    selectedId = null;
+    drawer.classList.remove("open");
+    scrim.classList.remove("open");
+    drawer.setAttribute("aria-hidden", "true");
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+    renderAll();
+  }
+
+  document.getElementById("drawer-close").addEventListener("click", closeDrawer);
+  scrim.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer(); });
+
+  document.getElementById("f-ciudad").addEventListener("change", function(e){ state.ciudad = e.target.value; renderAll(); });
+  document.getElementById("f-exposicion").addEventListener("change", function(e){ state.exposicion = e.target.value; renderAll(); });
+  document.getElementById("f-search").addEventListener("input", function(e){ state.search = e.target.value.trim().toLowerCase(); renderAll(); });
+
+  document.querySelectorAll('.chip[data-filter="tipologia"]').forEach(function(chip){
+    chip.addEventListener("click", function(){
+      var v = chip.dataset.value;
+      var active = chip.getAttribute("aria-pressed") === "true";
+      chip.setAttribute("aria-pressed", String(!active));
+      if (active) state.tipologias.delete(v); else state.tipologias.add(v);
+      renderAll();
+    });
+  });
+  document.querySelectorAll('.chip[data-filter="band"]').forEach(function(chip){
+    chip.addEventListener("click", function(){
+      var v = chip.dataset.value;
+      var active = chip.getAttribute("aria-pressed") === "true";
+      chip.setAttribute("aria-pressed", String(!active));
+      if (active) state.bands.delete(v); else state.bands.add(v);
+      renderAll();
+    });
+  });
+  document.getElementById("reset-filters").addEventListener("click", function(){
+    state.ciudad = ""; state.exposicion = ""; state.search = "";
+    state.tipologias.clear(); state.bands.clear();
+    document.getElementById("f-ciudad").value = "";
+    document.getElementById("f-exposicion").value = "";
+    document.getElementById("f-search").value = "";
+    document.querySelectorAll(".chip").forEach(function(c){ c.setAttribute("aria-pressed", "false"); });
+    renderAll();
+  });
+
+  var thead = document.querySelector("#pos-table thead");
+  thead.addEventListener("click", function(e){
+    var th = e.target.closest("th[data-sort]");
+    if (!th) return;
+    var key = th.dataset.sort;
+    if (state.sortKey === key){ state.sortDir = state.sortDir === "asc" ? "desc" : "asc"; }
+    else { state.sortKey = key; state.sortDir = key === "nombre" || key === "ciudad" || key === "tipologia" ? "asc" : "desc"; }
+    thead.querySelectorAll("th").forEach(function(t){ t.removeAttribute("aria-sort"); });
+    th.setAttribute("aria-sort", state.sortDir === "asc" ? "ascending" : "descending");
+    renderAll();
+  });
+
+  function translateStatic(){
+    document.querySelectorAll("[data-i18n]").forEach(function(el){ el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll("[data-i18n-html]").forEach(function(el){ el.innerHTML = t(el.dataset.i18nHtml); });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(function(el){ el.placeholder = t(el.dataset.i18nPlaceholder); });
+    document.querySelectorAll("[data-i18n-aria]").forEach(function(el){ el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
+  }
+
+  function setLang(lang){
+    if (!I18N[lang] || lang === currentLang){
+      if (I18N[lang]) return;
+    }
+    currentLang = I18N[lang] ? lang : "es";
+    try { localStorage.setItem("kz_pos_lang", currentLang); } catch(e){}
+    document.documentElement.lang = currentLang;
+    document.title = t("doc_title");
+    document.querySelectorAll(".lang-btn").forEach(function(b){ b.setAttribute("aria-pressed", String(b.dataset.lang === currentLang)); });
+    translateStatic();
+    buildScatterSkeleton();
+    if (selectedId !== null) openDrawer(selectedId); else renderAll();
+  }
+
+  document.querySelectorAll(".lang-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){ setLang(btn.dataset.lang); });
+  });
+
+  function renderAll(){
+    var rows = applyFilters();
+    renderTable(rows);
+    renderScatter(rows);
+  }
+
+  currentLang = detectLang();
+  document.documentElement.lang = currentLang;
+  document.title = t("doc_title");
+  document.querySelectorAll(".lang-btn").forEach(function(b){ b.setAttribute("aria-pressed", String(b.dataset.lang === currentLang)); });
+  translateStatic();
+
+  buildScatterSkeleton();
+  var initialTh = thead.querySelector('th[data-sort="score"]');
+  initialTh.setAttribute("aria-sort", "descending");
+  renderAll();
+
+})();
+</script>
+</body>
+</html>
