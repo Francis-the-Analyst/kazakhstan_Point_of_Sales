@@ -126,6 +126,12 @@
     letter-spacing: -0.01em; text-wrap: balance;
   }
   .subtitle{ margin: 0; color: var(--ink-600); font-size: .92rem; max-width: 62ch; }
+  .credit-inline{
+    color: var(--accent); font-weight: 500; margin-left: 6px;
+    font-size: clamp(.82rem, 1.4vw, 1rem); vertical-align: middle;
+  }
+  .credit-inline b{ color: var(--ink-900); font-weight: 700; }
+  .credit-arrow{ margin-right: 6px; font-weight: 700; }
 
   .lang-switch{
     display: flex; gap: 3px; border: 1px solid var(--line-strong); border-radius: 999px;
@@ -398,7 +404,10 @@
     <div class="top-row">
       <div class="top-copy">
         <p class="eyebrow" data-i18n="eyebrow">Identificación de puntos de venta retail · Kazajistán</p>
-        <h1 data-i18n="title">Radar de potencial por punto de venta</h1>
+        <h1>
+          <span data-i18n="title">Radar de potencial por punto de venta</span>
+          <span class="credit-inline"><span class="credit-arrow" aria-hidden="true">→</span><span data-i18n-html="credit">Estudio y dashboard de <b>Francisco González</b></span></span>
+        </h1>
         <p class="subtitle" data-i18n="subtitle">70 cuentas identificadas en Almaty, Astaná y Shymkent, puntuadas por encaje de categoría, exposición física en tienda y posicionamiento de precio. Filtra, ordena y haz clic en cualquier cuenta para ver el detalle y contactarla.</p>
       </div>
       <div class="lang-switch" role="group" aria-label="Language / Idioma / Язык">
@@ -556,6 +565,7 @@
       doc_title: "Radar POS Kazajistán",
       eyebrow: "Identificación de puntos de venta retail · Kazajistán",
       title: "Radar de potencial por punto de venta",
+      credit: "Estudio y dashboard de <b>Francisco González</b>",
       subtitle: "70 cuentas identificadas en Almaty, Astaná y Shymkent, puntuadas por encaje de categoría, exposición física en tienda y posicionamiento de precio. Filtra, ordena y haz clic en cualquier cuenta para ver el detalle y contactarla.",
       kpi_total: "Puntos analizados", kpi_alto: "Alto potencial", kpi_exposicion: "Con exposición física", kpi_ciudades: "Ciudades cubiertas",
       filter_ciudad: "Ciudad", opt_todas: "Todas", city_almaty: "Almaty", city_astana: "Astaná", city_shymkent: "Shymkent",
@@ -601,6 +611,7 @@
       doc_title: "Kazakhstan POS Radar",
       eyebrow: "Retail point-of-sale identification · Kazakhstan",
       title: "Point-of-sale potential radar",
+      credit: "Study and dashboard by <b>Francisco González</b>",
       subtitle: "70 accounts identified across Almaty, Astana and Shymkent, scored by category fit, physical showroom exposure and price positioning. Filter, sort and click any account to see the detail and contact it.",
       kpi_total: "Points analyzed", kpi_alto: "High potential", kpi_exposicion: "With physical exposure", kpi_ciudades: "Cities covered",
       filter_ciudad: "City", opt_todas: "All", city_almaty: "Almaty", city_astana: "Astana", city_shymkent: "Shymkent",
@@ -646,6 +657,7 @@
       doc_title: "Радар точек продаж Казахстана",
       eyebrow: "Идентификация розничных точек продаж · Казахстан",
       title: "Радар потенциала точек продаж",
+      credit: "Исследование и дашборд — <b>Francisco González</b>",
       subtitle: "70 контрагентов в Алматы, Астане и Шымкенте, оценённых по соответствию категории, наличию шоурума и ценовому позиционированию. Фильтруйте, сортируйте и кликайте по любому контрагенту, чтобы увидеть детали и связаться.",
       kpi_total: "Проанализировано точек", kpi_alto: "Высокий потенциал", kpi_exposicion: "С шоурумом", kpi_ciudades: "Городов охвачено",
       filter_ciudad: "Город", opt_todas: "Все", city_almaty: "Алматы", city_astana: "Астана", city_shymkent: "Шымкент",
